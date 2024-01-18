@@ -11,8 +11,8 @@ class Arbiter():
 		self.__led_pin=7
 		self.__pir_pin=11
 		self.__dht_pin=12
-		self.__lcd = None
-		self.__lcd = LCD()
+		# self.__lcd = LCD()
+		self.__lcd = None # My hardware isn't fully setup yet.
 		self.__temperature = 0
 		self.__humidity = 0
 		self.__running = True
@@ -41,7 +41,7 @@ class Arbiter():
 
 	def clear(self):
 		GPIO.cleanup()
-		self.__lcd.clear()
+		# self.__lcd.clear() # My hardware isn't fully setup yet.
 
 	def safe_exit(signum, frame):
 		exit(1)
@@ -56,11 +56,12 @@ class Arbiter():
 		while self.__running:
 			user_input = input('Command: ')
 			if user_input.lower() in exit_list:
+				print(time.ctime(), '- Exiting...')
 				self.__running = False
 			elif user_input.lower() in temperature:
 				print(time.ctime(), '- Temperature:{0:0.1f}C Humidity:{1:0.1f}%'.format(self.__temperature, self.__humidity))
 			elif user_input.lower() == 'help':
-				print('Currently supported commands are:\n')
+				print(time.ctime(), '- Currently supported commands are:\n')
 				[print(i) for i in exit_list]
 				[print(j) for j in temperature]
 			else:
@@ -68,7 +69,7 @@ class Arbiter():
 		self.__running = False
 		self.__threads[len(self.__threads)-2].join()
 		self.__threads[len(self.__threads)-1].join()
-		#self.clear()
+		# self.clear()
 
 	def lcd(self):
 		GPIO.setmode(GPIO.BOARD)
@@ -89,7 +90,7 @@ class Arbiter():
 			else:
 				GPIO.output(self.__led_pin,False)
 		GPIO.output(self.__led_pin,False)
-		self.clear()
+		# self.clear()
 
 	def temp_hum(self):
 		while self.__running:
