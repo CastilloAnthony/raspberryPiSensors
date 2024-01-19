@@ -16,7 +16,8 @@ class Arbiter():
 		self.__led_pin=7
 		self.__pir_pin=11
 		self.__dht_pin=12
-		self.__lcd = LCD()
+		self.__lcd = None
+		# self.__lcd = LCD()
 		self.__temperature = 0
 		self.__humidity = 0
 		self.__running = True
@@ -29,11 +30,10 @@ class Arbiter():
 		if not Path('./data').is_dir():
 			Path('./data').mkdir()
 			logging.info(time.ctime()+' - ./data directory has been created.')
-		else:
-			if not Path('~'+self.__filename).is_file():
-				with open(self.__filename, 'w', encoding='utf-8') as file:
-					file.write('time_seconds,humidity,temperature')
-				logging.info(time.ctime()+' - created '+self.__filename+' in the ./data folder.')
+		if not Path('~'+self.__filename).is_file():
+			with open(self.__filename, 'w', encoding='utf-8') as file:
+				file.write('time_seconds,humidity,temperature')
+			logging.info(time.ctime()+' - created '+self.__filename+' in the ./data folder.')
 		logging.info(time.ctime()+' - Using ./data to store temperature and humidity data.')
 		
 	def __del__(self):
