@@ -5,14 +5,18 @@ from signal import signal, SIGTERM, SIGHUP, pause
 from threading import Thread
 import time
 from pathlib import Path
+import logging
 
 class Arbiter():
 	def __init__(self):
+		self.__currTime = time.localtime()
+		logging.basicConfig(filename='runtime_'+self.configureFilename(self.__currTime)+'.log', encoding='utf-8', level=logging.DEBUG)
+		logging.info(time.ctime()+' - Initializing...')
+		logging.info(time.ctime()+' - Saving log to runtime_'+self.configureFilename(self.__currTime)+'.log')
 		self.__led_pin=7
 		self.__pir_pin=11
 		self.__dht_pin=12
-		# self.__lcd = LCD()
-		self.__lcd = None # My hardware isn't fully setup yet.
+		self.__lcd = LCD()
 		self.__temperature = 0
 		self.__humidity = 0
 		self.__running = True
@@ -20,18 +24,17 @@ class Arbiter():
 		self.__threads = []
 		signal(SIGTERM, self.safe_exit)
 		signal(SIGHUP, self.safe_exit)
-		self.__currTime = time.localtime()
-		# self.__filename = './logs/sensor_data_'+str(self.__currTime[0])+str(self.__currTime[1])+str(self.__currTime[2])+'.csv'
-		self.__filename = './logs/sensor_data_'+self.configureFilename(self.__currTime)+'.csv'
-		if not Path('./logs').is_dir():
-			Path('./logs').mkdir()
-			print(time.ctime(), '- ./logs directory has been created.')
+		# self.__filename = './data/sensor_data_'+str(self.__currTime[0])+str(self.__currTime[1])+str(self.__currTime[2])+'.csv'
+		self.__filename = './data/sensor_data_'+self.configureFilename(self.__currTime)+'.csv'
+		if not Path('./data').is_dir():
+			Path('./data').mkdir()
+			logging.info(time.ctime()+' - ./data directory has been created.')
 		else:
 			if not Path('~'+self.__filename).is_file():
-				with open(self.__filename, 'w', encoding="utf-8") as file:
-					file.write('time,humidity,temperature')
-				print(time.ctime(), '- created '+self.__filename+' in the ./logs folder.')
-		print(time.ctime(), '- Using ./logs to store temperature and humidity data.')
+				with open(self.__filename, 'w', encoding='utf-8') as file:
+					file.write('time_seconds,humidity,temperature')
+				logging.info(time.ctime()+' - created '+self.__filename+' in the ./data folder.')
+		logging.info(time.ctime()+' - Using ./data to store temperature and humidity data.')
 		
 	def __del__(self):
 		self.clear()
@@ -58,7 +61,7 @@ class Arbiter():
 	
 	def clear(self):
 		GPIO.cleanup()
-		# self.__lcd.clear() # My hardware isn't fully setup yet.
+		self.__lcd.clear()
 
 	def safe_exit(signum, frame):
 		exit(1)
@@ -73,12 +76,12 @@ class Arbiter():
 		while self.__running:
 			user_input = input('Command: ')
 			if user_input.lower() in exit_list:
-				print(time.ctime(), '- Exiting...')
+				logging.info(time.ctime()+' - Exiting...')
 				self.__running = False
 			elif user_input.lower() in temperature:
-				print(time.ctime(), '- Temperature:{0:0.1f}C Humidity:{1:0.1f}%'.format(self.__temperature, self.__humidity))
+				logging.info(time.ctime()+' - Temperature:{0:0.1f}C Humidity:{1:0.1f}%'.format(self.__temperature, self.__humidity))
 			elif user_input.lower() == 'help':
-				print(time.ctime(), '- Currently supported commands are:\n')
+				logging.info(time.ctime()+' - Currently supported commands are:\n')
 				[print(i) for i in exit_list]
 				[print(j) for j in temperature]
 			else:
@@ -116,19 +119,19 @@ class Arbiter():
 				self.__humidity, self.__temperature = humidity, temperature
 				currTime = time.localtime()
 				if currTime[2] == self.__currTime[2]: # Use the current file
-					with open(self.__filename, 'a', encoding="utf-8") as file:
+					with open(self.__filename, 'a', encoding='utf-8') as file:
 						file.write(str(time.time())+','+str(self.__humidity)+','+str(self.__temperature))
 				else: # Create a new file
 					self.__currTime = currTime
-					# self.__filename = './logs/sensor_data_'+str(self.__currTime[0])+str(self.__currTime[1])+str(self.__currTime[2])+'.csv'
-					self.__filename = './logs/sensor_data_'+self.configureFilename(self.__currTime)+'.csv'
-					with open(self.__filename, 'w', encoding="utf-8") as file:
-						file.write('time,humidity,temperature')
+					# self.__filename = './data/sensor_data_'+str(self.__currTime[0])+str(self.__currTime[1])+str(self.__currTime[2])+'.csv'
+					self.__filename = './data/sensor_data_'+self.configureFilename(self.__currTime)+'.csv'
+					with open(self.__filename, 'w', encoding='utf-8') as file:
+						file.write('time_seconds,humidity,temperature')
 						file.write(str(time.time())+','+str(self.__humidity)+','+str(self.__temperature))
-					print(time.ctime(), '- created '+self.__filename+' in the ./logs folder.')
+					logging.info(time.ctime()+' - created '+self.__filename+' in the ./data folder.')
 				del currTime
 			else:
-				print(time.ctime(), "- Could not read data from humidity sensor.")
+				logging.info(time.ctime()+' - Could not read data from humidity sensor.')
 			time.sleep(1)
 # end Arbiter
 
