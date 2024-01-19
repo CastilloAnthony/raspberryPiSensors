@@ -20,10 +20,12 @@ class Arbiter():
 		self.__threads = []
 		signal(SIGTERM, self.safe_exit)
 		signal(SIGHUP, self.safe_exit)
-
 		self.__currTime = time.localtime()
-		self.__filename = './logs/sensor_data_'+str(self.__currTime[0])+str(self.__currTime[1])+str(self.__currTime[2])+'.csv'
-		if Path('~./logs').is_dir():
+		# self.__filename = './logs/sensor_data_'+str(self.__currTime[0])+str(self.__currTime[1])+str(self.__currTime[2])+'.csv'
+		self.__filename = './logs/sensor_data_'+self.configureFilename(self.__currTime)+'.csv'
+		if not Path('~./logs').is_dir():
+			Path('~./logs').mkdir()
+		else:
 			if not Path('~'+self.__filename).is_file():
 				with open(self.__filename, 'w', encoding="utf-8") as file:
 					file.write('time,humidity,temperature')
@@ -39,6 +41,18 @@ class Arbiter():
 			del self.__threads[-1]
 		del self.__threads
 
+	def configureFilename(self, timeData):
+		currTimeString = timeData[0]
+		if len(str(timeData[1])) == 1:
+			currTimeString += '0'+str(timeData[1])
+		else:
+			currTimeString += str(timeData[1])
+		if len(str(timeData[2])) == 1:
+			currTimeString += '0'+str(timeData[2])
+		else:
+			currTimeString += str(timeData[2])
+		return currTimeString
+	
 	def clear(self):
 		GPIO.cleanup()
 		# self.__lcd.clear() # My hardware isn't fully setup yet.
@@ -103,7 +117,8 @@ class Arbiter():
 						file.write(str(time.time())+','+str(self.__humidity)+','+str(self.__temperature))
 				else: # Create a new file
 					self.__currTime = currTime
-					self.__filename = './logs/sensor_data_'+str(self.__currTime[0])+str(self.__currTime[1])+str(self.__currTime[2])+'.csv'
+					# self.__filename = './logs/sensor_data_'+str(self.__currTime[0])+str(self.__currTime[1])+str(self.__currTime[2])+'.csv'
+					self.__filename = './logs/sensor_data_'+self.configureFilename(self.__currTime)+'.csv'
 					with open(self.__filename, 'w', encoding="utf-8") as file:
 						file.write('time,humidity,temperature')
 						file.write(str(time.time())+','+str(self.__humidity)+','+str(self.__temperature))
