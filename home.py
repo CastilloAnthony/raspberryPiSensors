@@ -23,12 +23,15 @@ class Arbiter():
 		self.__currTime = time.localtime()
 		# self.__filename = './logs/sensor_data_'+str(self.__currTime[0])+str(self.__currTime[1])+str(self.__currTime[2])+'.csv'
 		self.__filename = './logs/sensor_data_'+self.configureFilename(self.__currTime)+'.csv'
-		if not Path('~./logs').is_dir():
-			Path('~./logs').mkdir()
+		if not Path('./logs').is_dir():
+			Path('./logs').mkdir()
+			print(time.ctime(), '- ./logs directory has been created.')
 		else:
 			if not Path('~'+self.__filename).is_file():
 				with open(self.__filename, 'w', encoding="utf-8") as file:
 					file.write('time,humidity,temperature')
+				print(time.ctime(), '- created '+self.__filename+' in the ./logs folder.')
+		print(time.ctime(), '- Using ./logs to store temperature and humidity data.')
 		
 	def __del__(self):
 		self.clear()
@@ -42,7 +45,7 @@ class Arbiter():
 		del self.__threads
 
 	def configureFilename(self, timeData):
-		currTimeString = timeData[0]
+		currTimeString = str(timeData[0])
 		if len(str(timeData[1])) == 1:
 			currTimeString += '0'+str(timeData[1])
 		else:
@@ -122,6 +125,7 @@ class Arbiter():
 					with open(self.__filename, 'w', encoding="utf-8") as file:
 						file.write('time,humidity,temperature')
 						file.write(str(time.time())+','+str(self.__humidity)+','+str(self.__temperature))
+					print(time.ctime(), '- created '+self.__filename+' in the ./logs folder.')
 				del currTime
 			else:
 				print(time.ctime(), "- Could not read data from humidity sensor.")
