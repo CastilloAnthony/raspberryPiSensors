@@ -102,7 +102,8 @@ class Arbiter():
 					with open(self.__filename, 'a', encoding="utf-8") as file:
 						file.write(str(time.time())+','+str(self.__humidity)+','+str(self.__temperature))
 				else: # Create a new file
-					self.__filename = './logs/sensor_data_'+str(currTime[0])+str(currTime[1])+str(currTime[2])+'.csv'
+					self.__currTime = currTime
+					self.__filename = './logs/sensor_data_'+str(self.__currTime[0])+str(self.__currTime[1])+str(self.__currTime[2])+'.csv'
 					with open(self.__filename, 'w', encoding="utf-8") as file:
 						file.write('time,humidity,temperature')
 						file.write(str(time.time())+','+str(self.__humidity)+','+str(self.__temperature))
