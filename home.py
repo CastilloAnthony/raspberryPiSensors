@@ -100,7 +100,7 @@ class Arbiter():
 		motion = False
 		while self.__running:
 			motion = GPIO.input(self.__pir_pin)
-			if motion:
+			if True:
 				GPIO.output(self.__led_pin,True)
 				currTime = time.localtime()
 				# self.__lcd.text(str(time.localtime()[3])+':'+str(time.localtime()[4])+':'+str(time.localtime()[5]), 1)
