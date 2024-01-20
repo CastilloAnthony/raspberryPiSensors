@@ -103,12 +103,24 @@ class Arbiter():
 			# motion = GPIO.input(self.__pir_pin)
 			if True:
 				GPIO.output(self.__led_pin,True)
-				# currTime = time.localtime()
-				currTime = self.configureFilename(time.localtime())
+				currTime = time.localtime()
+				currTimeString = ''
+				if len(str(currTime[3])) == 1:
+					currTimeString += '0'+str(currTime[3])
+				else:
+					currTimeString += str(currTime[3])
+				if len(str(currTime[4])) == 1:
+					currTimeString += '0'+str(currTime[4])
+				else:
+					currTimeString += str(currTime[4])
+				if len(str(currTime[5])) == 1:
+					currTimeString += '0'+str(currTime[5])
+				else:
+					currTimeString += str(currTime[5])
 				# self.__lcd.text(str(time.localtime()[3])+':'+str(time.localtime()[4])+':'+str(time.localtime()[5]), 1)
-				self.__lcd.text('Time: '+str(currTime[:2])+':'+str(currTime[2:4])+':'+str(currTime[4:]), 1)
+				self.__lcd.text('Time: '+str(currTimeString[:2])+':'+str(currTimeString[2:4])+':'+str(currTimeString[4:]), 1)
 				self.__lcd.text("T:{0:0.1f} C H:{1:0.1f}%".format(self.__temperature, self.__humidity), 2)
-				del currTime
+				del currTime, currTimeString
 				time.sleep(0.25)
 			else:
 				GPIO.output(self.__led_pin,False)
