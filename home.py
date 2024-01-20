@@ -14,9 +14,12 @@ class Arbiter():
 		logging.basicConfig(filename='runtime_'+self.configureFilename(self.__currTime)+'.log', encoding='utf-8', level=logging.DEBUG)
 		logging.info(time.ctime()+' - Initializing...')
 		logging.info(time.ctime()+' - Saving log to runtime_'+self.configureFilename(self.__currTime)+'.log')
-		self.__led_pin=13
-		self.__pir_pin=15
-		self.__dht_pin=16
+		# self.__led_pin=13 # BOARD
+		self.__led_pin=27 # BCM
+		# self.__pir_pin=15 # BOARD
+		self.__pir_pin=22 # BCM
+		# self.__dht_pin=16 # BOARD
+		self.__dht_pin=23
 		self.__lcd = LCD()
 		self.__temperature = 0
 		self.__humidity = 0
@@ -94,7 +97,7 @@ class Arbiter():
 
 	def lcd(self):
 		# GPIO.setmode(GPIO.BOARD)
-		print(GPIO.getmode())
+		# print(GPIO.getmode())
 		GPIO.setup(self.__pir_pin, GPIO.IN)
 		GPIO.setup(self.__led_pin, GPIO.OUT)
 		GPIO.output(self.__led_pin,False)
