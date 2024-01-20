@@ -1,5 +1,6 @@
 import RPi.GPIO as GPIO
-import Adafruit_DHT as DHT
+import adafruit_dHT as DHT
+import board
 from rpi_lcd import LCD
 from signal import signal, SIGTERM, SIGHUP, pause
 from threading import Thread
@@ -14,13 +15,13 @@ class Arbiter():
 		logging.info(time.ctime()+' - Initializing...')
 		logging.info(time.ctime()+' - Saving log to runtime_'+self.configureFilename(self.__currTime)+'.log')
 		self.__led_pin=13
-		self.__pir_pin=11
-		self.__dht_pin=12
+		self.__pir_pin=15
+		self.__dht_pin=16
 		self.__lcd = LCD()
 		self.__temperature = 0
 		self.__humidity = 0
 		self.__running = True
-		self.__DHT_SENSOR=DHT.DHT11
+		self.__DHT_SENSOR=DHT.DHT11(board.D23)
 		self.__threads = []
 		signal(SIGTERM, self.safe_exit)
 		signal(SIGHUP, self.safe_exit)
@@ -114,25 +115,41 @@ class Arbiter():
 
 	def temp_hum(self):
 		while self.__running:
-			humidity, temperature = DHT.read(self.__DHT_SENSOR, self.__dht_pin)
-			if humidity is not None and temperature is not None:
-				self.__humidity, self.__temperature = humidity, temperature
-				currTime = time.localtime()
-				if currTime[2] == self.__currTime[2]: # Use the current file
-					with open(self.__filename, 'a', encoding='utf-8') as file:
-						file.write(str(time.time())+','+str(self.__humidity)+','+str(self.__temperature))
-				else: # Create a new file
-					self.__currTime = currTime
-					# self.__filename = './data/sensor_data_'+str(self.__currTime[0])+str(self.__currTime[1])+str(self.__currTime[2])+'.csv'
-					self.__filename = './data/sensor_data_'+self.configureFilename(self.__currTime)+'.csv'
-					with open(self.__filename, 'w', encoding='utf-8') as file:
-						file.write('time_seconds,humidity,temperature')
-						file.write(str(time.time())+','+str(self.__humidity)+','+str(self.__temperature))
-					logging.info(time.ctime()+' - created '+self.__filename+' in the ./data folder.')
-				del currTime
-			else:
-				logging.info(time.ctime()+' - Could not read data from humidity sensor.')
-			time.sleep(1)
+			try:
+				# Print the values to the serial port
+				temperature = self.__DHT_SENSOR.temperature
+				humidity = self.__DHT_SENSOR.humidity
+				print(
+					"Temp: {:.1f} C    Humidity: {}% ".format(
+						temperature, humidity
+					)
+				)
+				if temperature != None and humidity != None:
+					self.__humidity, self.__temperature = humidity, temperature
+					currTime = time.localtime()
+					if currTime[2] == self.__currTime[2]: # Use the current file
+						with open(self.__filename, 'a', encoding='utf-8') as file:
+							file.write(str(time.time())+','+str(self.__humidity)+','+str(self.__temperature))
+					else: # Create a new file
+						self.__currTime = currTime
+						# self.__filename = './data/sensor_data_'+str(self.__currTime[0])+str(self.__currTime[1])+str(self.__currTime[2])+'.csv'
+						self.__filename = './data/sensor_data_'+self.configureFilename(self.__currTime)+'.csv'
+						with open(self.__filename, 'w', encoding='utf-8') as file:
+							file.write('time_seconds,humidity,temperature')
+							file.write(str(time.time())+','+str(self.__humidity)+','+str(self.__temperature))
+						logging.info(time.ctime()+' - created '+self.__filename+' in the ./data folder.')
+					del currTime
+			except RuntimeError as error:
+				# Errors happen fairly often, DHT's are hard to read, just keep going
+				logging.error(time.ctime()+' - '+str(error.args[0]))
+				time.sleep(2.0)
+				continue
+			except Exception as error:
+				self.__DHT_SENSOR.exit()
+				logging.error(time.ctime()+' - '+str(error))
+				raise error
+
+			time.sleep(2.0)
 # end Arbiter
 
 if __name__ == "__main__":
