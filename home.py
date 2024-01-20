@@ -98,40 +98,42 @@ class Arbiter():
 	def lcd(self):
 		# GPIO.setmode(GPIO.BOARD)
 		# print(GPIO.getmode())
-		GPIO.setup(self.__pir_pin, GPIO.IN)
-		GPIO.setup(self.__led_pin, GPIO.OUT)
-		GPIO.output(self.__led_pin,False)
+		# GPIO.setup(self.__pir_pin, GPIO.IN)
+		# GPIO.setup(self.__led_pin, GPIO.OUT)
+		# GPIO.output(self.__led_pin,False)
 		motion = False
 		while self.__running:
 			# motion = GPIO.input(self.__pir_pin)
-			if True:
-				GPIO.output(self.__led_pin,True)
-				currTime = time.localtime()
-				currTimeString = ''
-				if len(str(currTime[3])) == 1:
-					currTimeString += '0'+str(currTime[3])
-				else:
-					currTimeString += str(currTime[3])
-				if len(str(currTime[4])) == 1:
-					currTimeString += '0'+str(currTime[4])
-				else:
-					currTimeString += str(currTime[4])
-				if len(str(currTime[5])) == 1:
-					currTimeString += '0'+str(currTime[5])
-				else:
-					currTimeString += str(currTime[5])
-				# self.__lcd.text(str(time.localtime()[3])+':'+str(time.localtime()[4])+':'+str(time.localtime()[5]), 1)
-				self.__lcd.text('Time: '+str(currTimeString[:2])+':'+str(currTimeString[2:4])+':'+str(currTimeString[4:]), 1)
-				self.__lcd.text("T:{0:0.1f} C H:{1:0.1f}%".format(self.__temperature, self.__humidity), 2)
-				del currTime, currTimeString
-				time.sleep(0.25)
+			# if True:
+				# GPIO.output(self.__led_pin,True)
+			currTime = time.localtime()
+			currTimeString = ''
+			if len(str(currTime[3])) == 1:
+				currTimeString += '0'+str(currTime[3])
 			else:
-				GPIO.output(self.__led_pin,False)
-		GPIO.output(self.__led_pin,False)
+				currTimeString += str(currTime[3])
+			if len(str(currTime[4])) == 1:
+				currTimeString += '0'+str(currTime[4])
+			else:
+				currTimeString += str(currTime[4])
+			if len(str(currTime[5])) == 1:
+				currTimeString += '0'+str(currTime[5])
+			else:
+				currTimeString += str(currTime[5])
+			# self.__lcd.text(str(time.localtime()[3])+':'+str(time.localtime()[4])+':'+str(time.localtime()[5]), 1)
+			self.__lcd.text('Time: '+str(currTimeString[:2])+':'+str(currTimeString[2:4])+':'+str(currTimeString[4:]), 1)
+			self.__lcd.text("T:{0:0.1f} C H:{1:0.1f}%".format(self.__temperature, self.__humidity), 2)
+			del currTime, currTimeString
+			time.sleep(0.25)
+			# else:
+				# GPIO.output(self.__led_pin,False)
+		# GPIO.output(self.__led_pin,False)
 		# self.clear()
 
 	def temp_hum(self):
 		DHT_SENSOR=DHT.DHT11(board.D23)
+		GPIO.setup(self.__led_pin, GPIO.OUT)
+		GPIO.output(self.__led_pin,False)
 		while self.__running:
 			try:
 				# Print the values to the serial port
@@ -144,6 +146,7 @@ class Arbiter():
 					)
 				)
 				if temperature_c != None and humidity != None:
+					GPIO.output(self.__led_pin,True)
 					self.__humidity, self.__temperature = humidity, temperature_c
 					currTime = time.localtime()
 					if currTime[2] == self.__currTime[2]: # Use the current file
@@ -167,7 +170,7 @@ class Arbiter():
 				DHT_SENSOR.exit()
 				logging.error(time.ctime()+' - '+str(error))
 				raise error
-
+			GPIO.output(self.__led_pin,False)
 			time.sleep(2.0)
 # end Arbiter
 
