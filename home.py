@@ -67,9 +67,9 @@ class Arbiter():
 		exit(1)
 
 	def start(self):
-		self.__threads.append(Thread(target=self.temp_hum, name='temp_hum'))
-		self.__threads[len(self.__threads)-1].start()
 		self.__threads.append(Thread(target=self.lcd, name='lcd'))
+		self.__threads[len(self.__threads)-1].start()
+		self.__threads.append(Thread(target=self.temp_hum, name='temp_hum'))
 		self.__threads[len(self.__threads)-1].start()
 		exit_list = ['quit', 'exit', 'q']
 		temperature = ['temp', 'temperature', 'tp', 't', 'humd', 'humidity', 'hd', 'h']
