@@ -13,7 +13,7 @@ class Arbiter():
 		logging.basicConfig(filename='runtime_'+self.configureFilename(self.__currTime)+'.log', encoding='utf-8', level=logging.DEBUG)
 		logging.info(time.ctime()+' - Initializing...')
 		logging.info(time.ctime()+' - Saving log to runtime_'+self.configureFilename(self.__currTime)+'.log')
-		self.__led_pin=7
+		self.__led_pin=13
 		self.__pir_pin=11
 		self.__dht_pin=12
 		self.__lcd = LCD()
