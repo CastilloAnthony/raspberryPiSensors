@@ -69,6 +69,7 @@ class Arbiter():
 	def start(self):
 		self.__threads.append(Thread(target=self.lcd, name='lcd'))
 		self.__threads[len(self.__threads)-1].start()
+		time.sleep(5)
 		self.__threads.append(Thread(target=self.temp_hum, name='temp_hum'))
 		self.__threads[len(self.__threads)-1].start()
 		exit_list = ['quit', 'exit', 'q']
@@ -93,9 +94,9 @@ class Arbiter():
 		# self.clear()
 
 	def lcd(self):
-		GPIO.setmode(GPIO.BOARD)
-		GPIO.setup(self.__led_pin, GPIO.OUT)
+		# GPIO.setmode(GPIO.BOARD)
 		GPIO.setup(self.__pir_pin, GPIO.IN)
+		GPIO.setup(self.__led_pin, GPIO.OUT)
 		GPIO.output(self.__led_pin,False)
 		motion = False
 		while self.__running:
