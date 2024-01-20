@@ -67,10 +67,9 @@ class Arbiter():
 		exit(1)
 
 	def start(self):
-		self.__threads.append(Thread(target=self.lcd, name='lcd'))
-		self.__threads[len(self.__threads)-1].start()
-		time.sleep(5)
 		self.__threads.append(Thread(target=self.temp_hum, name='temp_hum'))
+		self.__threads[len(self.__threads)-1].start()
+		self.__threads.append(Thread(target=self.lcd, name='lcd'))
 		self.__threads[len(self.__threads)-1].start()
 		exit_list = ['quit', 'exit', 'q']
 		temperature = ['temp', 'temperature', 'tp', 't', 'humd', 'humidity', 'hd', 'h']
@@ -105,7 +104,7 @@ class Arbiter():
 				GPIO.output(self.__led_pin,True)
 				currTime = time.localtime()
 				# self.__lcd.text(str(time.localtime()[3])+':'+str(time.localtime()[4])+':'+str(time.localtime()[5]), 1)
-				self.__lcd.texT(str(currTime[3])+':'+str(currTime[4])+':'+str(currTime[5]), 1)
+				self.__lcd.text(str(currTime[3])+':'+str(currTime[4])+':'+str(currTime[5]), 1)
 				self.__lcd.text("Tp:{0:0.1f}C Hd:{1:0.1f}%".format(self.__temperature, self.__humidity), 2)
 				del currTime
 				time.sleep(0.25)
