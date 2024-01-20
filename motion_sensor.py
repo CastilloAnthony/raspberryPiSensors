@@ -18,9 +18,10 @@ try:
 	while True:
 		time.sleep(0.1)
 		current_state=GPIO.input(pir_sensor)
+		print("GPIO pin %s is %s" % (pir_sensor, current_state))
 		if current_state == 1:
 			GPIO.output(led,True)
-			print("GPIO pin %s is %s" % (pir_sensor, current_state))
+			# print("GPIO pin %s is %s" % (pir_sensor, current_state))
 			time.sleep(5)
 			GPIO.output(led,False)
 except KeyboardInterrupt:
