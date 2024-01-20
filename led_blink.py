@@ -1,14 +1,16 @@
 import RPi.GPIO as GPIO
 import time
 
+# led=7
+led=13
 GPIO.setmode(GPIO.BOARD)
-GPIO.setup(7,GPIO.OUT)
+GPIO.setup(led,GPIO.OUT)
 
-GPIO.output(7,False)
+GPIO.output(led),False)
 for i in range(10):
-	GPIO.output(7,True)
+	GPIO.output(led,True)
 	time.sleep(1)
-	GPIO.output(7,False)
+	GPIO.output(led,False)
 	time.sleep(1)
 
 GPIO.cleanup()
