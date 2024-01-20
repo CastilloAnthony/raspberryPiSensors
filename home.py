@@ -38,7 +38,7 @@ class Arbiter():
 		
 	def __del__(self):
 		self.clear()
-		del self.__led_pin, self.__pir_pin, self.__dht_pin, self.__DHT_SENSOR, self.__lcd, self.__temperature, self.__humidity, self.__running, self.__filename
+		del self.__led_pin, self.__pir_pin, self.__dht_pin, self.__lcd, self.__temperature, self.__humidity, self.__running, self.__filename
 		while len(self.__threads) > 0:
 			if self.__threads[-1].is_alive():
 				self.__threads[-1].join(1)
@@ -94,6 +94,7 @@ class Arbiter():
 
 	def lcd(self):
 		# GPIO.setmode(GPIO.BOARD)
+		print(GPIO.getmode())
 		GPIO.setup(self.__pir_pin, GPIO.IN)
 		GPIO.setup(self.__led_pin, GPIO.OUT)
 		GPIO.output(self.__led_pin,False)
@@ -101,7 +102,7 @@ class Arbiter():
 		while self.__running:
 			# motion = GPIO.input(self.__pir_pin)
 			if True:
-				# GPIO.output(self.__led_pin,True)
+				GPIO.output(self.__led_pin,True)
 				currTime = time.localtime()
 				# self.__lcd.text(str(time.localtime()[3])+':'+str(time.localtime()[4])+':'+str(time.localtime()[5]), 1)
 				self.__lcd.text(str(currTime[3])+':'+str(currTime[4])+':'+str(currTime[5]), 1)
@@ -118,15 +119,16 @@ class Arbiter():
 		while self.__running:
 			try:
 				# Print the values to the serial port
-				temperature = DHT_SENSOR.temperature
+				temperature_c = DHT_SENSOR.temperature
+				temperature_f = temperature_c * (9 / 5) + 32
 				humidity = DHT_SENSOR.humidity
 				print(
-					"Temp: {:.1f} C    Humidity: {}% ".format(
-						temperature, humidity
+					"Temp: {:.1f} F / {:.1f} C    Humidity: {}% ".format(
+						temperature_f, temperature_c, humidity
 					)
 				)
-				if temperature != None and humidity != None:
-					self.__humidity, self.__temperature = humidity, temperature
+				if temperature_c != None and humidity != None:
+					self.__humidity, self.__temperature = humidity, temperature_c
 					currTime = time.localtime()
 					if currTime[2] == self.__currTime[2]: # Use the current file
 						with open(self.__filename, 'a', encoding='utf-8') as file:
