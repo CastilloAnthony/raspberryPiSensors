@@ -15,28 +15,17 @@ GPIO.setup(led, GPIO.OUT)
 
 current_state=0
 GPIO.output(led,False)
-
-def lights():
-	print(time.ctime()+'- Motion Detected!')
-	GPIO.output(led,True)
-	time.sleep(1)
-	GPIO.output(led,False)
-
 try:
-	GPIO.add_event_detect(pir_sensor, GPIO.RISING, callback=lights)
 	while True:
-		# time.sleep(0.1)
-		# current_state=GPIO.input(pir_sensor)
-		# print("GPIO pin %s is %s" % (pir_sensor, current_state))
-		time.sleep(1)
-		# if current_state == 1:
-		# 	GPIO.output(led,True)
-		# 	# print("GPIO pin %s is %s" % (pir_sensor, current_state))
-		# 	time.sleep(1)
-		# else:
-		# 	GPIO.output(led,False)
-			
-		
+		time.sleep(0.5)
+		current_state=GPIO.input(pir_sensor)
+		print("GPIO pin %s is %s" % (pir_sensor, current_state))
+		if current_state == 1:
+			GPIO.output(led,True)
+			# print("GPIO pin %s is %s" % (pir_sensor, current_state))
+			# time.sleep(1)
+		else:
+			GPIO.output(led,False)
 except KeyboardInterrupt:
 	pass
 finally:
