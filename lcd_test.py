@@ -9,7 +9,7 @@ def safe_exit(signum, frame):
 signal(SIGTERM, safe_exit)
 signal(SIGHUP, safe_exit)
 
-tru:
+try:
 	lcd.text("Hello,", 1)
 	lcd.text("Raspberry Pi!", 2)
 	pause()

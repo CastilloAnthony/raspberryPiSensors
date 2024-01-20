@@ -16,8 +16,7 @@ class Arbiter():
 		self.__led_pin=7
 		self.__pir_pin=11
 		self.__dht_pin=12
-		self.__lcd = None
-		# self.__lcd = LCD()
+		self.__lcd = LCD()
 		self.__temperature = 0
 		self.__humidity = 0
 		self.__running = True
@@ -72,16 +71,17 @@ class Arbiter():
 		self.__threads.append(Thread(target=self.lcd, name='lcd'))
 		self.__threads[len(self.__threads)-1].start()
 		exit_list = ['quit', 'exit', 'q']
-		temperature = ['temp', 'temperature', 'tp', 'humd', 'humidity', 'hd']
+		temperature = ['temp', 'temperature', 'tp', 't', 'humd', 'humidity', 'hd', 'h']
 		while self.__running:
 			user_input = input('Command: ')
 			if user_input.lower() in exit_list:
+				print(time.ctime()+' - Exiting...')
 				logging.info(time.ctime()+' - Exiting...')
 				self.__running = False
 			elif user_input.lower() in temperature:
-				logging.info(time.ctime()+' - Temperature:{0:0.1f}C Humidity:{1:0.1f}%'.format(self.__temperature, self.__humidity))
+				print(time.ctime()+' - Temperature:{0:0.1f}C Humidity:{1:0.1f}%'.format(self.__temperature, self.__humidity))
 			elif user_input.lower() == 'help':
-				logging.info(time.ctime()+' - Currently supported commands are:\n')
+				print('Currently supported commands are:\n')
 				[print(i) for i in exit_list]
 				[print(j) for j in temperature]
 			else:

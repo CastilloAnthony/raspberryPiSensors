@@ -6,7 +6,7 @@ import RPi.GPIO as GPIO
 import time
 
 pir_sensor=11
-led=6
+led=7
 
 GPIO.setmode(GPIO.BOARD)
 GPIO.setup(pir_sensor, GPIO.IN)
