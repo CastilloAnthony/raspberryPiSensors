@@ -5,7 +5,8 @@
 import RPi.GPIO as GPIO
 import time
 
-pir_sensor=11
+# pir_sensor=11
+pir_sensor=15
 led=13
 
 GPIO.setmode(GPIO.BOARD)
@@ -22,7 +23,8 @@ try:
 		if current_state == 1:
 			GPIO.output(led,True)
 			# print("GPIO pin %s is %s" % (pir_sensor, current_state))
-			time.sleep(1)
+			# time.sleep(1)
+		else:
 			GPIO.output(led,False)
 except KeyboardInterrupt:
 	pass
