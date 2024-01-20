@@ -6,7 +6,7 @@ led=13
 GPIO.setmode(GPIO.BOARD)
 GPIO.setup(led,GPIO.OUT)
 
-GPIO.output(led),False)
+GPIO.output(led,False)
 for i in range(10):
 	GPIO.output(led,True)
 	time.sleep(1)
