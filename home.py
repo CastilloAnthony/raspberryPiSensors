@@ -170,8 +170,9 @@ class Arbiter():
 				DHT_SENSOR.exit()
 				logging.error(time.ctime()+' - '+str(error))
 				raise error
+			time.sleep(1.0)
 			GPIO.output(self.__led_pin,False)
-			time.sleep(2.0)
+			time.sleep(1.0)
 # end Arbiter
 
 if __name__ == "__main__":
