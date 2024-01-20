@@ -15,8 +15,8 @@ import adafruit_dht
 
 # while True:
 for i in dir(board):
-    dhtDevice = adafruit_dht.DHT11(board.i)
     print('Trying '+str(i))
+    dhtDevice = adafruit_dht.DHT11(board[i])
     try:
         # Print the values to the serial port
         temperature_c = dhtDevice.temperature
