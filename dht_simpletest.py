@@ -15,7 +15,7 @@ import adafruit_dht
 
 # while True:
 for i in dir(board):
-    print('Trying '+str(i)+str(type(i)))
+    print('Trying '+str(i)+str(type(i)), type(board.D18))
     dhtDevice = adafruit_dht.DHT11(board.i)
     try:
         # Print the values to the serial port
