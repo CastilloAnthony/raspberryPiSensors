@@ -1,5 +1,5 @@
 import RPi.GPIO as GPIO
-import adafruit_dHT as DHT
+import adafruit_dht as DHT
 import board
 from rpi_lcd import LCD
 from signal import signal, SIGTERM, SIGHUP, pause
