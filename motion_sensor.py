@@ -22,7 +22,7 @@ try:
 		if current_state == 1:
 			GPIO.output(led,True)
 			# print("GPIO pin %s is %s" % (pir_sensor, current_state))
-			# time.sleep(5)
+			time.sleep(1)
 			GPIO.output(led,False)
 except KeyboardInterrupt:
 	pass
