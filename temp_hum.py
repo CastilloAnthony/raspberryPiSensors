@@ -1,8 +1,9 @@
-import Adafruit_DHT
+import adafruit_dht
+import board
 #import RPi.GPIO as GPIO
 import time
 
-DHT_SENSOR=Adafruit_DHT.DHT11
+DHT_SENSOR=adafruit_dht.DHT11(board.D18)
 # DHT_PIN=12
 DHT_PIN=18
 
