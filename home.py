@@ -21,7 +21,7 @@ class Arbiter():
 		self.__temperature = 0
 		self.__humidity = 0
 		self.__running = True
-		self.__DHT_SENSOR=DHT.DHT11(board.D23)
+		
 		self.__threads = []
 		signal(SIGTERM, self.safe_exit)
 		signal(SIGHUP, self.safe_exit)
@@ -114,11 +114,12 @@ class Arbiter():
 		# self.clear()
 
 	def temp_hum(self):
+		DHT_SENSOR=DHT.DHT11(board.D23)
 		while self.__running:
 			try:
 				# Print the values to the serial port
-				temperature = self.__DHT_SENSOR.temperature
-				humidity = self.__DHT_SENSOR.humidity
+				temperature = DHT_SENSOR.temperature
+				humidity = DHT_SENSOR.humidity
 				print(
 					"Temp: {:.1f} C    Humidity: {}% ".format(
 						temperature, humidity
@@ -145,7 +146,7 @@ class Arbiter():
 				time.sleep(2.0)
 				continue
 			except Exception as error:
-				self.__DHT_SENSOR.exit()
+				DHT_SENSOR.exit()
 				logging.error(time.ctime()+' - '+str(error))
 				raise error
 
