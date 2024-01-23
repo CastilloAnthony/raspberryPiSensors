@@ -7,6 +7,8 @@ from threading import Thread
 import time
 from pathlib import Path
 import logging
+import math
+import ADC0834
 
 class Arbiter():
 	def __init__(self):
@@ -15,15 +17,14 @@ class Arbiter():
 		logging.info(time.ctime()+' - Initializing...')
 		logging.info(time.ctime()+' - Saving log to runtime_'+self.configureFilename(self.__currTime)+'.log')
 		# self.__led_pin=13 # BOARD
-		self.__led_pin=27 # BCM
-		# self.__pir_pin=15 # BOARD
-		self.__pir_pin=22 # BCM
+		self.__led_pin=21 # BCM
 		# self.__dht_pin=16 # BOARD
 		self.__dht_pin=23
 		self.__lcd = LCD()
 		self.__temperature = 0
 		self.__humidity = 0
 		self.__running = True
+		ADC0834.setup()
 		
 		self.__threads = []
 		signal(SIGTERM, self.safe_exit)
@@ -147,7 +148,14 @@ class Arbiter():
 				)
 				if temperature_c != None and humidity != None:
 					GPIO.output(self.__led_pin,True)
-					self.__humidity, self.__temperature = humidity, temperature_c
+					# Thermistor
+					analogVal = ADC0834.getResult()
+					Vr = 5 * float(analogVal) / 255
+					Rt = 10000 * Vr / (5 - Vr)
+					temp = 1/(((math.log(Rt / 10000)) / 3950) + (1 / (273.15+25)))
+					Cel = temp - 273.15
+					# Fah = Cel * 1.8 + 32
+					self.__humidity, self.__temperature = humidity, (temperature_c+Cel)/2
 					currTime = time.localtime()
 					if currTime[2] == self.__currTime[2]: # Use the current file
 						with open(self.__filename, 'a', encoding='utf-8') as file:
