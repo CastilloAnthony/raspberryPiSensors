@@ -12,7 +12,10 @@ def loop():
     while True:
         analogVal = ADC0834.getResult()
         Vr = 5 * float(analogVal) / 255
-        Rt = 10000 * Vr / (5 - Vr)
+        if not (5 - Vr) == 0:
+            Rt = 10000 * Vr / (5 - Vr)
+        else:
+            Rt = 10000 * Vr / 0.01
         temp = 1/(((math.log(Rt / 10000)) / 3950) + (1 / (273.15+25)))
         Cel = temp - 273.15
         Fah = Cel * 1.8 + 32
