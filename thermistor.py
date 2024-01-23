@@ -16,11 +16,12 @@ def loop():
             Rt = 10000 * Vr / 0.01
         else:
             Rt = 10000 * Vr / (5 - Vr)
+        print('Analog Val: %.2f Voltage: %.2f V Resitance: %.2f Ohms' % (analogVal, Vr, Rt))
         temp = 1/(((math.log(Rt / 10000)) / 3950) + (1 / (273.15+25)))
         Cel = temp - 273.15
         Fah = Cel * 1.8 + 32
         print ('Celsius: %.2f °C  Fahrenheit: %.2f ℉' % (Cel, Fah))
-        print('Analog Val: %.2f Voltage: %.2f V Resitance: %.2f Ohms' % (analogVal, Vr, Rt))
+        
         time.sleep(0.2)
 
 if __name__ == '__main__':
