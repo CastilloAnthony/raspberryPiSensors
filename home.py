@@ -141,11 +141,11 @@ class Arbiter():
 				temperature_c = DHT_SENSOR.temperature
 				temperature_f = temperature_c * (9 / 5) + 32
 				humidity = DHT_SENSOR.humidity
-				print(
-					"Temp: {:.1f} F / {:.1f} C    Humidity: {}% ".format(
-						temperature_f, temperature_c, humidity
-					)
-				)
+				# print(
+				# 	"Temp: {:.1f} F / {:.1f} C    Humidity: {}% ".format(
+				# 		temperature_f, temperature_c, humidity
+				# 	)
+				# )
 				if temperature_c != None and humidity != None:
 					GPIO.output(self.__led_pin,True)
 					# Thermistor
@@ -155,7 +155,7 @@ class Arbiter():
 					temp = 1/(((math.log(Rt / 10000)) / 3950) + (1 / (273.15+25)))
 					Cel = temp - 273.15
 					Fah = Cel * 1.8 + 32
-					print ('Celsius: %.2f °C  Fahrenheit: %.2f ℉' % (Cel, Fah))
+					# print ('Celsius: %.2f °C  Fahrenheit: %.2f ℉' % (Cel, Fah))
 					self.__humidity, self.__temperature = humidity, (temperature_c+Cel)/2
 					currTime = time.localtime()
 					if currTime[2] == self.__currTime[2]: # Use the current file
