@@ -154,7 +154,8 @@ class Arbiter():
 					Rt = 10000 * Vr / (5 - Vr)
 					temp = 1/(((math.log(Rt / 10000)) / 3950) + (1 / (273.15+25)))
 					Cel = temp - 273.15
-					# Fah = Cel * 1.8 + 32
+					Fah = Cel * 1.8 + 32
+					print ('Celsius: %.2f °C  Fahrenheit: %.2f ℉' % (Cel, Fah))
 					self.__humidity, self.__temperature = humidity, (temperature_c+Cel)/2
 					currTime = time.localtime()
 					if currTime[2] == self.__currTime[2]: # Use the current file
