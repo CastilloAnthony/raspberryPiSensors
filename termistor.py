@@ -18,7 +18,7 @@ def loop():
         Fah = Cel * 1.8 + 32
         print ('Celsius: %.2f °C  Fahrenheit: %.2f ℉' % (Cel, Fah))
         time.sleep(0.2)
-*
+
 if __name__ == '__main__':
     init()
     try:
