@@ -29,7 +29,6 @@ class Arbiter():
 		self.__threads = []
 		signal(SIGTERM, self.safe_exit)
 		signal(SIGHUP, self.safe_exit)
-		# self.__filename = './data/sensor_data_'+str(self.__currTime[0])+str(self.__currTime[1])+str(self.__currTime[2])+'.csv'
 		self.__filename = './data/sensor_data_'+self.configureFilename(self.__currTime)+'.csv'
 		if not Path('./data').is_dir():
 			Path('./data').mkdir()
@@ -42,7 +41,7 @@ class Arbiter():
 		
 	def __del__(self):
 		self.clear()
-		del self.__led_pin, self.__pir_pin, self.__dht_pin, self.__lcd, self.__temperature, self.__humidity, self.__running, self.__filename
+		del self.__led_pin, self.__dht_pin, self.__lcd, self.__temperature, self.__humidity, self.__running, self.__filename
 		while len(self.__threads) > 0:
 			if self.__threads[-1].is_alive():
 				self.__threads[-1].join(1)
@@ -97,16 +96,8 @@ class Arbiter():
 		# self.clear()
 
 	def lcd(self):
-		# GPIO.setmode(GPIO.BOARD)
-		# print(GPIO.getmode())
-		# GPIO.setup(self.__pir_pin, GPIO.IN)
-		# GPIO.setup(self.__led_pin, GPIO.OUT)
-		# GPIO.output(self.__led_pin,False)
 		motion = False
 		while self.__running:
-			# motion = GPIO.input(self.__pir_pin)
-			# if True:
-				# GPIO.output(self.__led_pin,True)
 			currTime = time.localtime()
 			currTimeString = ''
 			if len(str(currTime[3])) == 1:
@@ -121,15 +112,10 @@ class Arbiter():
 				currTimeString += '0'+str(currTime[5])
 			else:
 				currTimeString += str(currTime[5])
-			# self.__lcd.text(str(time.localtime()[3])+':'+str(time.localtime()[4])+':'+str(time.localtime()[5]), 1)
 			self.__lcd.text('Time: '+str(currTimeString[:2])+':'+str(currTimeString[2:4])+':'+str(currTimeString[4:]), 1)
 			self.__lcd.text("T:{0:0.1f} C H:{1:0.1f}%".format(self.__temperature, self.__humidity), 2)
 			del currTime, currTimeString
 			time.sleep(0.25)
-			# else:
-				# GPIO.output(self.__led_pin,False)
-		# GPIO.output(self.__led_pin,False)
-		# self.clear()
 
 	def temp_hum(self):
 		DHT_SENSOR=DHT.DHT11(board.D23)
@@ -148,7 +134,7 @@ class Arbiter():
 				# )
 				if temperature_c != None and humidity != None:
 					GPIO.output(self.__led_pin,True)
-					# Thermistor
+					# Getting Thermistor readings
 					analogVal = ADC0834.getResult()
 					Vr = 5 * float(analogVal) / 255
 					Rt = 10000 * Vr / (5 - Vr)
@@ -156,6 +142,7 @@ class Arbiter():
 					Cel = temp - 273.15
 					Fah = Cel * 1.8 + 32
 					# print ('Celsius: %.2f °C  Fahrenheit: %.2f ℉' % (Cel, Fah))
+					# Adding the two temperature readings together and dividing by two, finding their average
 					self.__humidity, self.__temperature = humidity, (temperature_c+Cel)/2
 					currTime = time.localtime()
 					if currTime[2] == self.__currTime[2]: # Use the current file
@@ -163,7 +150,6 @@ class Arbiter():
 							file.write(str(time.time())+','+str(self.__humidity)+','+str(self.__temperature))
 					else: # Create a new file
 						self.__currTime = currTime
-						# self.__filename = './data/sensor_data_'+str(self.__currTime[0])+str(self.__currTime[1])+str(self.__currTime[2])+'.csv'
 						self.__filename = './data/sensor_data_'+self.configureFilename(self.__currTime)+'.csv'
 						with open(self.__filename, 'w', encoding='utf-8') as file:
 							file.write('time_seconds,humidity,temperature')
