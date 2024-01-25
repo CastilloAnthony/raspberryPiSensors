@@ -9,6 +9,7 @@ from pathlib import Path
 import logging
 import math
 import ADC0834
+import numpy as np
 
 class Arbiter():
 	def __init__(self):
@@ -121,9 +122,11 @@ class Arbiter():
 		DHT_SENSOR=DHT.DHT11(board.D23)
 		GPIO.setup(self.__led_pin, GPIO.OUT)
 		GPIO.output(self.__led_pin,False)
+		temperatureList = np.array()
 		while self.__running:
 			try:
 				# Print the values to the serial port
+				np.append(temperatureList, ADC0834.getResult())
 				temperature_c = DHT_SENSOR.temperature
 				temperature_f = temperature_c * (9 / 5) + 32
 				humidity = DHT_SENSOR.humidity
@@ -135,7 +138,9 @@ class Arbiter():
 				if temperature_c != None and humidity != None:
 					GPIO.output(self.__led_pin,True)
 					# Getting Thermistor readings
-					analogVal = ADC0834.getResult()
+					analogVal = np.avg(temperatureList)
+					del temperatureList
+					temperatureList = np.array()
 					Vr = 5 * float(analogVal) / 255
 					Rt = 10000 * Vr / (5 - Vr)
 					temp = 1/(((math.log(Rt / 10000)) / 3950) + (1 / (273.15+25)))
@@ -143,7 +148,10 @@ class Arbiter():
 					Fah = Cel * 1.8 + 32
 					# print ('Celsius: %.2f °C  Fahrenheit: %.2f ℉' % (Cel, Fah))
 					# Adding the two temperature readings together and dividing by two, finding their average
-					self.__humidity, self.__temperature = humidity, (temperature_c+Cel)/2
+					if temperature_c+1 > Cel or temperature_c-1 < Cel: # If the thermistor's value deviates by more than one in either direction from the dht then we'll use both device's values
+						self.__humidity, self.__temperature = humidity, (temperature_c+Cel)/2
+					else: # Otherwise we'll just use the thermistor's
+						self.__humidity, self.__temperature = humidity, Cel
 					currTime = time.localtime()
 					if currTime[2] == self.__currTime[2]: # Use the current file
 						with open(self.__filename, 'a', encoding='utf-8') as file:

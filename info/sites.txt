@@ -1,0 +1,4 @@
+https://docs.sunfounder.com/projects/raphael-kit/en/latest/python/play_with_python.html
+https://docs.sunfounder.com/projects/raphael-kit/en/latest/python/2.2.3_dht-11_python.html
+https://docs.sunfounder.com/projects/raphael-kit/en/latest/python/2.2.2_thermistor_python.html
+https://toptechboy.com/
