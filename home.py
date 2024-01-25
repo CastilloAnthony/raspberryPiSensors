@@ -121,12 +121,23 @@ class Arbiter():
 		DHT_SENSOR=DHT.DHT11(board.D23)
 		GPIO.setup(self.__led_pin, GPIO.OUT)
 		GPIO.output(self.__led_pin,False)
+		temperatureList = []
 		while self.__running:
 			try:
+				# Getting Thermistor readings
+				analogVal = ADC0834.getResult()
+				Vr = 5 * float(analogVal) / 255
+				Rt = 10000 * Vr / (5 - Vr)
+				temp = 1/(((math.log(Rt / 10000)) / 3950) + (1 / (273.15+25)))
+				Cel = temp - 273.15
+				Fah = Cel * 1.8 + 32
+				temperatureList.append(Cel)
+
 				# Print the values to the serial port
 				temperature_c = DHT_SENSOR.temperature
 				temperature_f = temperature_c * (9 / 5) + 32
 				humidity = DHT_SENSOR.humidity
+					
 				# print(
 				# 	"Temp: {:.1f} F / {:.1f} C    Humidity: {}% ".format(
 				# 		temperature_f, temperature_c, humidity
@@ -134,16 +145,18 @@ class Arbiter():
 				# )
 				if temperature_c != None and humidity != None:
 					GPIO.output(self.__led_pin,True)
-					# Getting Thermistor readings
-					analogVal = ADC0834.getResult()
-					Vr = 5 * float(analogVal) / 255
-					Rt = 10000 * Vr / (5 - Vr)
-					temp = 1/(((math.log(Rt / 10000)) / 3950) + (1 / (273.15+25)))
-					Cel = temp - 273.15
-					Fah = Cel * 1.8 + 32
+					totalTemp = 0
+					for i in temperatureList:
+						totalTemp += i
+					avgTemp = totalTemp / len(temperatureList)
+					del temperatureList
+					temperatureList = []
 					# print ('Celsius: %.2f °C  Fahrenheit: %.2f ℉' % (Cel, Fah))
-					# Adding the two temperature readings together and dividing by two, finding their average
-					self.__humidity, self.__temperature = humidity, (temperature_c+Cel)/2
+					if not temperature_c+1 >= avgTemp and not temperature_c-1 <= avgTemp:
+						self.__humidity, self.__temperature = humidity, avgTemp
+					else:
+						# Adding the two temperature readings together and dividing by two, finding their average
+						self.__humidity, self.__temperature = humidity, (temperature_c+Cel)/2
 					currTime = time.localtime()
 					if currTime[2] == self.__currTime[2]: # Use the current file
 						with open(self.__filename, 'a', encoding='utf-8') as file:
