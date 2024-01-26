@@ -21,7 +21,8 @@ class Arbiter():
 		# self.__dht_pin=16 # BOARD
 		self.__dht_pin=23
 		self.__lcd = LCD()
-		self.__temperature = 0
+		self.__temperature_c = 0
+		self.__temperature_f = 0
 		self.__humidity = 0
 		self.__running = True
 		ADC0834.setup()
@@ -41,7 +42,7 @@ class Arbiter():
 		
 	def __del__(self):
 		self.clear()
-		del self.__led_pin, self.__dht_pin, self.__lcd, self.__temperature, self.__humidity, self.__running, self.__filename
+		del self.__led_pin, self.__dht_pin, self.__lcd, self.__temperature_c, self.__temperature_f, self.__humidity, self.__running, self.__filename
 		while len(self.__threads) > 0:
 			if self.__threads[-1].is_alive():
 				self.__threads[-1].join(1)
@@ -75,7 +76,7 @@ class Arbiter():
 		self.__threads.append(Thread(target=self.lcd, name='lcd'))
 		self.__threads[len(self.__threads)-1].start()
 		exit_list = ['quit', 'exit', 'q']
-		temperature = ['temp', 'temperature', 'tp', 't', 'humd', 'humidity', 'hd', 'h']
+		temperature = ['temp', 'temperature', 'tp', 't',]# 'humd', 'humidity', 'hd', 'h']
 		while self.__running:
 			user_input = input('Command: ')
 			if user_input.lower() in exit_list:
@@ -83,7 +84,7 @@ class Arbiter():
 				logging.info(time.ctime()+' - Exiting...')
 				self.__running = False
 			elif user_input.lower() in temperature:
-				print(time.ctime()+' - Temperature:{0:0.1f}C Humidity:{1:0.1f}%'.format(self.__temperature, self.__humidity))
+				print(time.ctime()+' - Temperature:{0:0.1f}C /{1:0.1f}F'.format(self.__temperature_c, self.__temperature_f#, self.__humidity))
 			elif user_input.lower() == 'help':
 				print('Currently supported commands are:\n')
 				[print(i) for i in exit_list]
@@ -113,7 +114,7 @@ class Arbiter():
 			else:
 				currTimeString += str(currTime[5])
 			self.__lcd.text('Time: '+str(currTimeString[:2])+':'+str(currTimeString[2:4])+':'+str(currTimeString[4:]), 1)
-			self.__lcd.text("T:{0:0.1f} C H:{1:0.1f}%".format(self.__temperature, self.__humidity), 2)
+			self.__lcd.text("T:{0:0.1f} C / {1:0.1f}F".format(self.__temperature_c, self.__temperature_f) 2)#, self.__humidity), 2)
 			del currTime, currTimeString
 			time.sleep(0.25)
 
@@ -130,7 +131,8 @@ class Arbiter():
 				temp = 1/(((math.log(Rt / 10000)) / 3950) + (1 / (273.15+25)))
 				Cel = temp - 273.15
 				Fah = Cel * 1.8 + 32
-				self.__temperature = Cel
+				self.__temperature_c = Cel
+				self.__temperature_f = Fah
 
 				# Print the values to the serial port
 				temperature_c = DHT_SENSOR.temperature
@@ -146,20 +148,20 @@ class Arbiter():
 					GPIO.output(self.__led_pin,True)
 					# print ('Celsius: %.2f °C  Fahrenheit: %.2f ℉' % (Cel, Fah))
 					# if not temperature_c+1 >= Cel and not temperature_c-1 <= Cel:
-					# 	self.__humidity, self.__temperature = humidity, Cel
+					# 	self.__humidity, self.__temperature_c = humidity, Cel
 					# else:
 					# 	# Adding the two temperature readings together and dividing by two, finding their average
-					self.__humidity, self.__temperature = humidity, temperature_c
+					self.__humidity, self.__temperature_c = humidity, temperature_c
 					currTime = time.localtime()
 					if currTime[2] == self.__currTime[2]: # Use the current file
 						with open(self.__filename, 'a', encoding='utf-8') as file:
-							file.write(str(time.time())+','+str(self.__humidity)+','+str(self.__temperature))
+							file.write(str(time.time())+','+str(self.__humidity)+','+str(self.__temperature_c))
 					else: # Create a new file
 						self.__currTime = currTime
 						self.__filename = './data/sensor_data_'+self.configureFilename(self.__currTime)+'.csv'
 						with open(self.__filename, 'w', encoding='utf-8') as file:
 							file.write('time_seconds,humidity,temperature')
-							file.write(str(time.time())+','+str(self.__humidity)+','+str(self.__temperature))
+							file.write(str(time.time())+','+str(self.__humidity)+','+str(self.__temperature_c))
 						logging.info(time.ctime()+' - created '+self.__filename+' in the ./data folder.')
 					del currTime
 			except RuntimeError as error:
