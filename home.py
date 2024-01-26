@@ -114,7 +114,7 @@ class Arbiter():
 			else:
 				currTimeString += str(currTime[5])
 			self.__lcd.text('Time: '+str(currTimeString[:2])+':'+str(currTimeString[2:4])+':'+str(currTimeString[4:]), 1)
-			self.__lcd.text("T:{0:0.1f} C / {1:0.1f}F".format(self.__temperature_c, self.__temperature_f) 2)#, self.__humidity), 2)
+			self.__lcd.text("T:{0:0.1f} C / {1:0.1f}F".format(self.__temperature_c, self.__temperature_f), 2)#, self.__humidity), 2)
 			del currTime, currTimeString
 			time.sleep(0.25)
 
