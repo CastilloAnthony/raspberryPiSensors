@@ -151,7 +151,8 @@ class Arbiter():
 					# 	self.__humidity, self.__temperature_c = humidity, Cel
 					# else:
 					# 	# Adding the two temperature readings together and dividing by two, finding their average
-					self.__humidity, self.__temperature_c = humidity, temperature_c
+					# self.__humidity, self.__temperature_c = humidity, temperature_c
+					self.__humidity = humidity
 					currTime = time.localtime()
 					if currTime[2] == self.__currTime[2]: # Use the current file
 						with open(self.__filename, 'a', encoding='utf-8') as file:
