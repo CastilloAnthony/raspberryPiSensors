@@ -145,11 +145,11 @@ class Arbiter():
 				if temperature_c != None and humidity != None:
 					GPIO.output(self.__led_pin,True)
 					# print ('Celsius: %.2f °C  Fahrenheit: %.2f ℉' % (Cel, Fah))
-					if not temperature_c+1 >= Cel and not temperature_c-1 <= Cel:
-						self.__humidity, self.__temperature = humidity, Cel
-					else:
-						# Adding the two temperature readings together and dividing by two, finding their average
-						self.__humidity, self.__temperature = humidity, (temperature_c+Cel)/2
+					# if not temperature_c+1 >= Cel and not temperature_c-1 <= Cel:
+					# 	self.__humidity, self.__temperature = humidity, Cel
+					# else:
+					# 	# Adding the two temperature readings together and dividing by two, finding their average
+					self.__humidity, self.__temperature = humidity, temperature_c
 					currTime = time.localtime()
 					if currTime[2] == self.__currTime[2]: # Use the current file
 						with open(self.__filename, 'a', encoding='utf-8') as file:
