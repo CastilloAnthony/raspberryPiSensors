@@ -84,7 +84,7 @@ class Arbiter():
 				logging.info(time.ctime()+' - Exiting...')
 				self.__running = False
 			elif user_input.lower() in temperature:
-				print(time.ctime()+' - Temperature:{0:0.1f}C /{1:0.1f}F'.format(self.__temperature_c, self.__temperature_f#, self.__humidity))
+				print(time.ctime()+' - Temperature:{0:0.1f}C /{1:0.1f}F'.format(self.__temperature_c, self.__temperature_f))#, self.__humidity))
 			elif user_input.lower() == 'help':
 				print('Currently supported commands are:\n')
 				[print(i) for i in exit_list]
