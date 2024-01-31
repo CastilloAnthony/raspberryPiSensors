@@ -154,7 +154,7 @@ class Arbiter():
 				# self.__temperature_f = Fah
 				temperature_list.append(Cel)
 				# if len(temperature_list) >= sampleSize:
-				if time.time() % 5 == 0:
+				if round(time.time()) % 5 == 0:
 					GPIO.output(self.__led_pin,True)
 					temperature_c = 0
 					for i in temperature_list:
