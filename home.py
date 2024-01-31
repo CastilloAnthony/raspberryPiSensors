@@ -174,10 +174,11 @@ class Arbiter():
 						logging.info(time.ctime()+' - created '+self.__filename+' in the ./data folder.')
 					del currTime
 					temperature_list = []
-					time.sleep(1)
+					# time.sleep(1)
 					GPIO.output(self.__led_pin,False)
 				else:
-					time.sleep(4/sampleSize)
+					# time.sleep(4/sampleSize)
+					pass
 			except Exception as error:
 				logging.error(time.ctime()+' - '+str(error))
 
