@@ -175,9 +175,9 @@ class Arbiter():
 					time.sleep(1)
 					GPIO.output(self.__led_pin,False)
 				else:
-					time.sleep(4/sampleSize)
-			except:
-				pass
+					time.sleep(9/sampleSize)
+			except Exception as error:
+				logging.error(time.ctime()+' - '+str(error))
 
 	def temp_hum(self):
 		DHT_SENSOR=DHT.DHT11(board.D23)
