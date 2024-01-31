@@ -71,7 +71,7 @@ class Arbiter():
 		exit(1)
 
 	def start(self):
-		self.__threads.append(Thread(target=self.temp_hum, name='temp_hum'))
+		self.__threads.append(Thread(target=self.temperature, name='temperature'))
 		self.__threads[len(self.__threads)-1].start()
 		self.__threads.append(Thread(target=self.lcd, name='lcd'))
 		self.__threads[len(self.__threads)-1].start()
@@ -85,10 +85,28 @@ class Arbiter():
 				self.__running = False
 			elif user_input.lower() in temperature:
 				print(time.ctime()+' - Temperature:{0:0.1f}C /{1:0.1f}F'.format(self.__temperature_c, self.__temperature_f))#, self.__humidity))
+			elif user_input.lower() == 'threads':
+				for i in self.__threads:
+					print(time.ctime()+' - '+str(i.name)+' Alive Status:'+str(i.is_alive()))
+			elif user_input.lower() == 'restart':
+				print(time.ctime()+' - Restarting threads...')
+				while len(self.__threads) > 0:
+					print(time.ctime()+' - Killing thread '+str(self.__threads[0].name))
+					self.__threads[0].join(1)
+					if self.__threads[0].is_alive():
+						self.__threads[0].terminate()
+					del self.__threads[0]
+
+				self.__threads.append(Thread(target=self.temperature, name='temperature'))
+				self.__threads[len(self.__threads)-1].start()
+				self.__threads.append(Thread(target=self.lcd, name='lcd'))
+				self.__threads[len(self.__threads)-1].start()
 			elif user_input.lower() == 'help':
 				print('Currently supported commands are:\n')
 				[print(i) for i in exit_list]
 				[print(j) for j in temperature]
+				print('threads')
+				print('restart')
 			else:
 				print('Command not recognized.')
 		self.__running = False
@@ -117,6 +135,49 @@ class Arbiter():
 			self.__lcd.text("T:{0:0.1f}C / {1:0.1f}F".format(self.__temperature_c, self.__temperature_f), 2)#, self.__humidity), 2)
 			del currTime, currTimeString
 			time.sleep(0.25)
+
+	def temperature(self):
+		GPIO.setup(self.__led_pin, GPIO.OUT)
+		GPIO.output(self.__led_pin,False)
+		temperature_list = []
+		sampleSize = 10
+		while self.__running:
+			try:
+				# Getting Thermistor readings
+				analogVal = ADC0834.getResult()
+				Vr = 5 * float(analogVal) / 255
+				Rt = 10000 * Vr / (5 - Vr)
+				temp = 1/(((math.log(Rt / 10000)) / 3950) + (1 / (273.15+25)))
+				Cel = temp - 273.15
+				# Fah = Cel * 1.8 + 32
+				# self.__temperature_c = Cel
+				# self.__temperature_f = Fah
+				temperature_list.append(Cel)
+				if len(temperature_list) >= sampleSize:
+					GPIO.output(self.__led_pin,True)
+					temperature_c = 0
+					for i in temperature_list:
+						temperature_c += i
+					self.__temperature_c = temperature_c / len(temperature_list)
+					self.__temperature_f = self.__temperature_c * 1.8 +32
+					currTime = time.localtime()
+					if currTime[2] == self.__currTime[2]: # Use the current file
+						with open(self.__filename, 'a', encoding='utf-8') as file:
+							file.write(str(time.time())+','+str(self.__humidity)+','+str(self.__temperature_c))
+					else: # Create a new file
+						self.__currTime = currTime
+						self.__filename = './data/sensor_data_'+self.configureFilename(self.__currTime)+'.csv'
+						with open(self.__filename, 'w', encoding='utf-8') as file:
+							file.write('time_seconds,humidity,temperature')
+							file.write(str(time.time())+','+str(self.__humidity)+','+str(self.__temperature_c))
+						logging.info(time.ctime()+' - created '+self.__filename+' in the ./data folder.')
+					del currTime
+					time.sleep(1)
+					GPIO.output(self.__led_pin,False)
+				else:
+					time.sleep(4/sampleSize)
+			except:
+				pass
 
 	def temp_hum(self):
 		DHT_SENSOR=DHT.DHT11(board.D23)
