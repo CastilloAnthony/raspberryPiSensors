@@ -116,25 +116,27 @@ class Arbiter():
 
 	def lcd(self):
 		motion = False
+		currTimestamp = time.time()
 		while self.__running:
 			currTime = time.localtime()
-			currTimeString = ''
-			if len(str(currTime[3])) == 1:
-				currTimeString += '0'+str(currTime[3])
-			else:
-				currTimeString += str(currTime[3])
-			if len(str(currTime[4])) == 1:
-				currTimeString += '0'+str(currTime[4])
-			else:
-				currTimeString += str(currTime[4])
-			if len(str(currTime[5])) == 1:
-				currTimeString += '0'+str(currTime[5])
-			else:
-				currTimeString += str(currTime[5])
-			self.__lcd.text('Time: '+str(currTimeString[:2])+':'+str(currTimeString[2:4])+':'+str(currTimeString[4:]), 1)
-			self.__lcd.text("T:{0:0.1f}C / {1:0.1f}F".format(self.__temperature_c, self.__temperature_f), 2)#, self.__humidity), 2)
-			del currTime, currTimeString
-			time.sleep(0.25)
+			if (time.time() - currTimestamp) >= 1:
+				currTimeString = ''
+				if len(str(currTime[3])) == 1:
+					currTimeString += '0'+str(currTime[3])
+				else:
+					currTimeString += str(currTime[3])
+				if len(str(currTime[4])) == 1:
+					currTimeString += '0'+str(currTime[4])
+				else:
+					currTimeString += str(currTime[4])
+				if len(str(currTime[5])) == 1:
+					currTimeString += '0'+str(currTime[5])
+				else:
+					currTimeString += str(currTime[5])
+				self.__lcd.text('Time: '+str(currTimeString[:2])+':'+str(currTimeString[2:4])+':'+str(currTimeString[4:]), 1)
+				self.__lcd.text("T:{0:0.1f}C / {1:0.1f}F".format(self.__temperature_c, self.__temperature_f), 2)#, self.__humidity), 2)
+				del currTime, currTimeString
+				# time.sleep(0.25)
 
 	def temperature(self):
 		GPIO.setup(self.__led_pin, GPIO.OUT)
