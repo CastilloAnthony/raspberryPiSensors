@@ -172,10 +172,11 @@ class Arbiter():
 							file.write(str(time.time())+','+str(self.__humidity)+','+str(self.__temperature_c))
 						logging.info(time.ctime()+' - created '+self.__filename+' in the ./data folder.')
 					del currTime
+					temperature_list = []
 					time.sleep(1)
 					GPIO.output(self.__led_pin,False)
 				else:
-					time.sleep(9/sampleSize)
+					time.sleep(4/sampleSize)
 			except Exception as error:
 				logging.error(time.ctime()+' - '+str(error))
 
