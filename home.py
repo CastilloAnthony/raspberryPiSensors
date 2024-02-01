@@ -18,7 +18,7 @@ class Arbiter():
 		logging.info(time.ctime()+' - Saving log to runtime_'+self.configureFilename(self.__currTime)+'.log')
 		# self.__led_pin=13 # BOARD
 		self.__led_pin=21 # BCM
-		self._led = False
+		self.__led = False
 		# self.__dht_pin=16 # BOARD
 		self.__dht_pin=23
 		self.__lcd = LCD()
@@ -195,6 +195,7 @@ class Arbiter():
 		while self.__running:
 			if self.__led:
 				GPIO.output(self.__led_pin,True)
+				self.__led = False
 				time.sleep(1)
 				GPIO.output(self.__led_pin,False)
 			time.sleep(0.1)
