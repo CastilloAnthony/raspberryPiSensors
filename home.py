@@ -18,6 +18,7 @@ class Arbiter():
 		logging.info(time.ctime()+' - Saving log to runtime_'+self.configureFilename(self.__currTime)+'.log')
 		# self.__led_pin=13 # BOARD
 		self.__led_pin=21 # BCM
+		self._led = False
 		# self.__dht_pin=16 # BOARD
 		self.__dht_pin=23
 		self.__lcd = LCD()
@@ -71,6 +72,8 @@ class Arbiter():
 		exit(1)
 
 	def start(self):
+		self.__threads.append(Thread(target=self.led_control, name='led_control'))
+		self.__threads[len(self.__threads)-1].start()
 		self.__threads.append(Thread(target=self.temperature, name='temperature'))
 		self.__threads[len(self.__threads)-1].start()
 		self.__threads.append(Thread(target=self.lcd, name='lcd'))
@@ -96,7 +99,8 @@ class Arbiter():
 					if self.__threads[0].is_alive():
 						self.__threads[0].terminate()
 					del self.__threads[0]
-
+				self.__threads.append(Thread(target=self.led_control, name='led_control'))
+				self.__threads[len(self.__threads)-1].start()
 				self.__threads.append(Thread(target=self.temperature, name='temperature'))
 				self.__threads[len(self.__threads)-1].start()
 				self.__threads.append(Thread(target=self.lcd, name='lcd'))
@@ -139,10 +143,10 @@ class Arbiter():
 				# time.sleep(0.25)
 
 	def temperature(self):
-		GPIO.setup(self.__led_pin, GPIO.OUT)
-		GPIO.output(self.__led_pin,False)
+		# GPIO.setup(self.__led_pin, GPIO.OUT)
+		# GPIO.output(self.__led_pin,False)
 		temperature_list = []
-		sampleSize = 10
+		# sampleSize = 10
 		while self.__running:
 			try:
 				# Getting Thermistor readings
@@ -157,7 +161,8 @@ class Arbiter():
 				temperature_list.append(Cel)
 				# if len(temperature_list) >= sampleSize:
 				if round(time.time()) % 5 == 0:
-					GPIO.output(self.__led_pin,True)
+					# GPIO.output(self.__led_pin,True)
+					self.__led = True
 					temperature_c = 0
 					for i in temperature_list:
 						temperature_c += i
@@ -175,13 +180,24 @@ class Arbiter():
 							file.write(str(time.time())+','+str(self.__humidity)+','+str(self.__temperature_c))
 						logging.info(time.ctime()+' - created '+self.__filename+' in the ./data folder.')
 					del currTime
+					del temperature_list
 					temperature_list = []
-					time.sleep(1)
-					GPIO.output(self.__led_pin,False)
+					# time.sleep(1)
+					# GPIO.output(self.__led_pin,False)
 				# else:
 					# time.sleep(4/sampleSize)
 			except Exception as error:
 				logging.error(time.ctime()+' - '+str(error))
+
+	def led_control(self):
+		GPIO.setup(self.__led_pin, GPIO.OUT)
+		GPIO.output(self.__led_pin,False)
+		while self.__running:
+			if self.__led:
+				GPIO.output(self.__led_pin,True)
+				time.sleep(1)
+				GPIO.output(self.__led_pin,False)
+			time.sleep(0.1)
 
 	def temp_hum(self):
 		DHT_SENSOR=DHT.DHT11(board.D23)
