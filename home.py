@@ -147,6 +147,7 @@ class Arbiter():
 		# GPIO.output(self.__led_pin,False)
 		temperature_list = []
 		# sampleSize = 10
+		prevTime = time.time()
 		while self.__running:
 			try:
 				# Getting Thermistor readings
@@ -160,8 +161,9 @@ class Arbiter():
 				# self.__temperature_f = Fah
 				temperature_list.append(Cel)
 				# if len(temperature_list) >= sampleSize:
-				if round(time.time()) % 5 == 0:
+				if round(time.time()) % 5 == 0 and (time.time() - prevTime) >= 1:
 					# GPIO.output(self.__led_pin,True)
+					prevTime = time.time()
 					self.__led = True
 					temperature_c = 0
 					for i in temperature_list:
@@ -182,7 +184,6 @@ class Arbiter():
 					del currTime
 					del temperature_list
 					temperature_list = []
-					# time.sleep(1)
 					# GPIO.output(self.__led_pin,False)
 				# else:
 					# time.sleep(4/sampleSize)
